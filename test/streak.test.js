@@ -11,3 +11,35 @@ it("returns a streak of 2 for workouts on two consecutive days", () => {
     const now = new Date("2026-02-11T10:00:00.000Z"); // Feb 11, noon local
     expect(currentStreakDays(workouts, now, 120)).toBe(2);
 });
+
+it("returns 0 for empty array", () => {
+    expect(currentStreakDays([])).toBe(0);
+});
+
+it("returns 0 for non-array input", () => {
+    expect(currentStreakDays(null)).toBe(0);
+});
+
+it("ignores invalid timestamps", () => {
+    const now = new Date("2026-02-11T10:00:00.000Z");
+    expect(currentStreakDays(["not-a-date"], now)).toBe(0);
+});
+
+it("stops counting at a gap in the streak", () => {
+    const workouts = [
+        "2026-02-08T12:00:00.000Z", // Feb 8 — gap on Feb 9
+        "2026-02-10T12:00:00.000Z", // Feb 10
+        "2026-02-11T12:00:00.000Z", // Feb 11
+    ];
+    const now = new Date("2026-02-11T18:00:00.000Z");
+    expect(currentStreakDays(workouts, now)).toBe(2);
+});
+
+it("counts today when a workout already exists", () => {
+    const workouts = [
+        "2026-02-10T12:00:00.000Z",
+        "2026-02-11T08:00:00.000Z", // worked out today
+    ];
+    const now = new Date("2026-02-11T18:00:00.000Z");
+    expect(currentStreakDays(workouts, now)).toBe(2);
+});
